@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  clerkUserId  String        @unique
+  email        String        @unique
+  name         String?
+  imageUrl     String?
+  transactions Transaction[]
+  accounts     Account[]
+  budgets      Budget[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("users")
+}
+
+model Account {
+  id           String        @id @default(uuid())
+  name         String
+  type         AccountType
+  balance      Decimal       @default(0)
+  isDefault    Boolean       @default(false)
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  budgets      Budget[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([isDefault]) // Added for better query performance
+  @@map("accounts")
+}
+
+enum AccountType {
+  CURRENT
+  SAVINGS
+  INVESTMENT // Added common account type
+  CREDIT
+  LOAN
+}
+
+model Transaction {
+  id                String             @id @default(uuid())
+  type              TransactionType
+  amount            Decimal
+  description       String?
+  date              DateTime
+  category          String
+  receiptUrl        String?
+  isRecurring       Boolean            @default(false)
+  recurringInterval RecurringInterval?
+  nextRecurringDate DateTime?
+  lastProcessed     DateTime?
+  status            TransactionStatus  @default(COMPLETED)
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId         String
+  account           Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([accountId])
+  @@index([date]) // Important for date range queries
+  @@index([category]) // Useful for filtering by category
+  @@index([isRecurring]) // Helpful for recurring transaction queries
+  @@map("transactions")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE // Changed from EXPENSES to EXPENSE (grammatically correct)
+  TRANSFER // Added transfer type
+}
+
+enum RecurringInterval {
+  DAILY
+  WEEKLY
+  BIWEEKLY // Added common interval
+  MONTHLY
+  QUARTERLY // Added
+  YEARLY
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED // Added
+  REFUNDED // Added
+}
+
+model Budget {
+  id            String    @id @default(uuid())
+  name          String?   @db.VarChar(100)
+  amount        Decimal   @db.Decimal(10, 2)
+  startDate     DateTime?
+  endDate       DateTime?
+  lastAlertSent DateTime?
+  userId        String
+  accountId     String
+  category      String?   @db.VarChar(50)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([userId, accountId])
+  @@index([userId])
+  @@index([accountId])
+  @@index([category])
+  @@map("budgets")
+}
