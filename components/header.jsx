@@ -15,13 +15,13 @@ const Header = async () => {
       <nav className='container mx-auto py-4 flex items-center justify-between'>
         <Link href="/">
           <Image
-            src="/logo.png"
+            src="/logo1.png"
             alt='logo image'
             width={100} height={20}
-            className='h-12 w-auto object-contain' />
+            className='h-20 w-auto object-contain' />
         </Link>
 
-        <div className='flex items-center space-x-4'>
+        <div className='flex items-center space-x-2 lg:space-x-4'>
 
           <SignedIn>
             <Link href={"/dashboard"}>
@@ -56,7 +56,7 @@ const Header = async () => {
             <UserButton
               appearance={{
                 variables: {
-                  avatarBoxSize: "64px", // or "72px", "80px", etc.
+                  avatarBoxSize: "72px", // or "72px", "80px", etc.
                 }
               }}
             />

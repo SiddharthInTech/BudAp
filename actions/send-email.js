@@ -5,7 +5,6 @@ export async function sendEmail({ to, subject, react, html }) {
     const apiKey = process.env.RESEND_API_KEY;
 
     if (!apiKey) {
-        console.error("❌ RESEND_API_KEY environment variable is missing");
         return { success: false, error: "Email service not configured" };
     }
 
@@ -31,27 +30,17 @@ export async function sendEmail({ to, subject, react, html }) {
 
         const htmlOutput = await render(react);
 
-        console.log("📧 Final Payload Before Send:", {
-            to: toArray,
-            subject,
-            htmlType: typeof htmlOutput,
-            preview: htmlOutput.substring(0, 200) + "..." // only first 200 chars
-        });
-
         payload.html = htmlOutput;
 
 
         const { data, error } = await resend.emails.send(payload);
 
         if (error) {
-            console.error("❌ Resend API error:", error);
             return { success: false, error };
         }
 
-        console.log("✅ Email sent successfully:", data);
         return { success: true, data };
     } catch (err) {
-        console.error("❌ Failed to send email:", err);
         return { success: false, error: err?.message || "Unknown error occurred" };
     }
 }

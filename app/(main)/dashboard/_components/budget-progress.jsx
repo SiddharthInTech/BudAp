@@ -10,10 +10,7 @@ import { toast } from 'sonner'
 import { Progress } from '@/components/ui/progress'
 
 const BudgetProgress = ({ initialBudget, currentExpenses, accountId }) => {
-  // Add console logs to debug
-  console.log('currentExpenses:', currentExpenses);
-  console.log('initialBudget:', initialBudget);
-  console.log('percentUsed calculation:', initialBudget ? (currentExpenses / initialBudget.amount) * 100 : 0);
+ 
   const [isEditing, setIsEditing] = useState(false);
   const [newBudget, setNewBudget] = useState(
     initialBudget?.amount?.toString() || ""
