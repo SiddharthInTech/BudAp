@@ -8,8 +8,7 @@
     "build": "prisma generate && next build",  
     "start": "next start",
     "lint": "next lint",
-    "inngest": "inngest dev",
-    "postinstall": "prisma generate"           
+    "inngest": "inngest dev"
 },
   "dependencies": {
     "@arcjet/next": "^1.0.0-beta.11",
